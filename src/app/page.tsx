@@ -7,37 +7,23 @@ import { CompatibilityReport, createCompatibilityIssues } from '@/components/cus
 import { EmailContentInput } from '@/components/custom/email-content-input';
 import { EmailContentPreview } from '@/components/custom/email-content-preview';
 import { ThemeModeToggle } from '@/components/custom/theme-mode-toggle';
+import { useAsyncData } from '@/hooks/use-async-data';
 import { useDebounce } from '@/hooks/use-debounce';
 import { fetchCanIEmailData, type CanIEmailData, buildCssPropertyMap, type CanIEmailFeature } from '@/lib/caniemail';
 import { extractFeatures } from '@/lib/css-extractor';
 
 export default function EmailContentPreviewer() {
   const [html, setHtml] = React.useState('');
-  const [canIEmailData, setCanIEmailData] = React.useState<CanIEmailData | null>(null);
-  const [cssPropertyMap, setCssPropertyMap] = React.useState<Map<string, CanIEmailFeature>>(new Map());
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-
   const debouncedHtml = useDebounce(html, 300);
+  const {
+    data: canIEmailData,
+    error,
+    isLoading,
+  } = useAsyncData<CanIEmailData>(fetchCanIEmailData, 'Failed to load compatibility data. Please refresh the page.');
 
-  React.useEffect(() => {
-    async function loadData() {
-      try {
-        setIsLoading(true);
-        const data = await fetchCanIEmailData();
-        setCanIEmailData(data);
-        setCssPropertyMap(buildCssPropertyMap(data));
-        setError(null);
-      } catch (err) {
-        console.error('Failed to load caniemail data:', err);
-        setError('Failed to load compatibility data. Please refresh the page.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    void loadData();
-  }, []);
+  const cssPropertyMap = React.useMemo(() => {
+    return canIEmailData ? buildCssPropertyMap(canIEmailData) : new Map<string, CanIEmailFeature>();
+  }, [canIEmailData]);
 
   const issues = React.useMemo(() => {
     if (!debouncedHtml.trim() || cssPropertyMap.size === 0) {
@@ -49,15 +35,11 @@ export default function EmailContentPreviewer() {
     return createCompatibilityIssues(extracted.cssProperties, cssPropertyMap);
   }, [debouncedHtml, cssPropertyMap]);
 
-  const handleHtmlChange = React.useCallback((newHtml: string) => {
-    setHtml(newHtml);
-  }, []);
-
   return (
     <div className="flex h-screen flex-col">
-      <header className="border-border flex items-center justify-between border-b px-6 py-4">
+      <header className="border-border flex items-center justify-between border-b px-5 py-3">
         <div>
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Email Client Previewer</h1>
+          <h1 className="text-xl">Email Client Previewer</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">Test your email HTML against major email clients</p>
         </div>
         <div className="flex items-center gap-4">
@@ -84,8 +66,8 @@ export default function EmailContentPreviewer() {
       )}
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="border-border flex w-1/3 min-w-[300px] flex-col border-r">
-          <EmailContentInput value={html} onChange={handleHtmlChange} />
+        <div className="flex w-1/3 min-w-[300px] flex-col border-r">
+          <EmailContentInput value={html} onChange={setHtml} />
         </div>
 
         <div className="border-border flex w-1/3 min-w-[300px] flex-col border-r">
@@ -99,14 +81,14 @@ export default function EmailContentPreviewer() {
 
       <footer className="border-border border-t px-6 py-3 text-center text-xs text-slate-400 dark:text-slate-500">
         Compatibility data powered by{' '}
-        <a
+        <Link
           target="_blank"
           rel="noopener noreferrer"
           href="https://www.caniemail.com"
           className="text-sky-500 hover:text-sky-400"
         >
           caniemail.com
-        </a>
+        </Link>
         {canIEmailData && ` (${canIEmailData.data.length} features)`}
       </footer>
     </div>

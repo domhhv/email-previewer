@@ -6,16 +6,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 type TooltipButtonProps = {
   children: ReactNode;
-  delayDuration: number;
+  delayDuration?: number;
   ref?: Ref<HTMLButtonElement>;
   tooltip: string;
   onClick: () => void;
-  onMouseEnter: () => void;
+  onMouseEnter?: () => void;
 } & Pick<ComponentProps<typeof Button>, 'variant' | 'size' | 'disabled'>;
 
 export function TooltipButton({
   children,
-  delayDuration,
+  delayDuration = 500,
   disabled = false,
   onClick,
   onMouseEnter,
