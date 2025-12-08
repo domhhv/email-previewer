@@ -41,7 +41,7 @@ export function EmailContentPreview({ html }: EmailPreviewProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="border-border flex items-center justify-between border-b px-4 py-3">
-        <h2 className="font-semibold">Live Preview</h2>
+        <h2>Live Preview</h2>
         <span className="text-sm">Browser rendering</span>
       </div>
       <div className="flex-1 overflow-hidden bg-slate-100 p-4 dark:bg-slate-800">

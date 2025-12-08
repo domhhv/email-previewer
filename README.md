@@ -102,10 +102,10 @@ For true cross-client preview screenshots, commercial tools like [Litmus](https:
 
 ## Future Improvements
 
-- [ ] **Monaco Editor** - Syntax highlighting and better editing experience
-- [ ] **React Email Support** - Compile `.tsx` files using `@react-email/render`
-- [ ] **Simulated Client Views** - Apply known CSS transforms per client (Gmail stripping, Outlook restrictions)
+- [x] **CodeMirror Editor** - Syntax highlighting and better editing experience
 - [ ] **HTML Element Checking** - Currently only checks CSS; could add HTML element/attribute support
+- [ ] **Simulated Client Views** - Apply known CSS transforms per client (Gmail stripping, Outlook restrictions)
+- [ ] **React Email Support** - Compile `.tsx` files using `@react-email/render`
 - [ ] **Dark Mode Preview** - Toggle to simulate dark mode rendering
 - [ ] **Export Report** - Download compatibility report as PDF/JSON
 - [ ] **URL Sharing** - Share email + report via URL

@@ -1,12 +1,23 @@
 /**
- * Extract CSS properties and HTML elements from email HTML
+ * Extractor of CSS properties and HTML elements from email HTML
  * This is a simple regex-based extractor - could be upgraded to PostCSS for robustness
  */
 
-export interface ExtractedFeatures {
+interface ExtractedFeatures {
   cssProperties: Set<string>;
   htmlElements: Set<string>;
   htmlAttributes: Set<string>;
+}
+
+/**
+ * Main extraction function - returns all features used in the HTML
+ */
+export function extractFeatures(html: string): ExtractedFeatures {
+  return {
+    cssProperties: extractCssProperties(html),
+    htmlAttributes: extractHtmlAttributes(html),
+    htmlElements: extractHtmlElements(html),
+  };
 }
 
 /**
@@ -106,95 +117,3 @@ function extractHtmlAttributes(html: string): Set<string> {
 
   return attributes;
 }
-
-/**
- * Main extraction function - returns all features used in the HTML
- */
-export function extractFeatures(html: string): ExtractedFeatures {
-  return {
-    cssProperties: extractCssProperties(html),
-    htmlAttributes: extractHtmlAttributes(html),
-    htmlElements: extractHtmlElements(html),
-  };
-}
-
-/**
- * Normalize CSS property names to match caniemail slugs
- * e.g., "background-color" -> "background-color"
- * e.g., "@media" -> "at-media"
- * e.g., "@media (prefers-color-scheme)" -> "at-media-prefers-color-scheme"
- */
-export function normalizeCssPropertyToSlug(property: string): string {
-  // Handle @-rules
-  if (property.startsWith('@')) {
-    // @media (feature) -> at-media-feature
-    const atRuleMatch = property.match(/@([a-z-]+)(?:\s*\(([a-z-]+)\))?/);
-
-    if (atRuleMatch) {
-      const rule = atRuleMatch[1];
-      const feature = atRuleMatch[2];
-
-      if (feature) {
-        return `at-${rule}-${feature}`;
-      }
-
-      return `at-${rule}`;
-    }
-  }
-
-  return property;
-}
-
-/**
- * Map of CSS shorthand properties to their longhand equivalents
- * Used to check if using a shorthand might have compatibility issues
- */
-export const CSS_SHORTHANDS: Record<string, string[]> = {
-  flex: ['flex-grow', 'flex-shrink', 'flex-basis'],
-  font: ['font-style', 'font-variant', 'font-weight', 'font-size', 'line-height', 'font-family'],
-  margin: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
-  padding: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
-  animation: [
-    'animation-name',
-    'animation-duration',
-    'animation-timing-function',
-    'animation-delay',
-    'animation-iteration-count',
-    'animation-direction',
-    'animation-fill-mode',
-    'animation-play-state',
-  ],
-  background: [
-    'background-color',
-    'background-image',
-    'background-position',
-    'background-size',
-    'background-repeat',
-    'background-origin',
-    'background-clip',
-    'background-attachment',
-  ],
-  border: [
-    'border-width',
-    'border-style',
-    'border-color',
-    'border-top',
-    'border-right',
-    'border-bottom',
-    'border-left',
-  ],
-  'border-radius': [
-    'border-top-left-radius',
-    'border-top-right-radius',
-    'border-bottom-right-radius',
-    'border-bottom-left-radius',
-  ],
-  grid: [
-    'grid-template-rows',
-    'grid-template-columns',
-    'grid-template-areas',
-    'grid-auto-rows',
-    'grid-auto-columns',
-    'grid-auto-flow',
-  ],
-};

@@ -1,3 +1,7 @@
+import camelcaseKeys from 'camelcase-keys';
+import ky from 'ky';
+import type { SnakeCasedPropertiesDeep } from 'type-fest';
+
 /**
  * Types and utilities for working with caniemail.com data
  * API: https://www.caniemail.com/api/data.json
@@ -10,35 +14,34 @@ enum SupportLevels {
   UNKNOWN = 'u',
 }
 
-export interface CanIEmailFeature {
-  slug: string;
-  title: string;
-  description: string;
-  url: string;
+export type CanIEmailFeature = {
   category: 'css' | 'html' | 'image' | 'others';
-  tags: string[];
+  description: string;
   keywords: string | null;
-  last_test_date: string;
-  test_url: string;
-  test_results_url: string | null;
-  stats: Record<string, Record<string, Record<string, string>>>;
+  lastTestDate: string;
   notes: string | null;
-  notes_by_num: Record<string, string> | null;
-}
+  notesByNum: Record<string, string> | null;
+  slug: string;
+  stats: Record<string, Record<string, Record<string, string>>>;
+  tags: string[];
+  testResultsUrl: string | null;
+  testUrl: string;
+  title: string;
+  url: string;
+};
 
-export interface CanIEmailData {
-  api_version: string;
-  last_update_date: string;
+export type CanIEmailData = {
+  apiVersion: string;
+  data: CanIEmailFeature[];
+  lastUpdateDate: string;
   nicenames: {
     category: Record<string, string>;
     family: Record<string, string>;
     platform: Record<string, string>;
     support: Record<string, string>;
   };
-  data: CanIEmailFeature[];
-}
+};
 
-// Major email clients we care about for the report
 export const MAJOR_CLIENTS = [
   { family: 'gmail', label: 'Gmail', platform: 'desktop-webmail' },
   { family: 'outlook', label: 'Outlook Windows', platform: 'windows' },
@@ -52,31 +55,29 @@ export const MAJOR_CLIENTS = [
 
 export type MajorClient = (typeof MAJOR_CLIENTS)[number];
 
-let cachedData: CanIEmailData | null = null;
+let cachedData: CanIEmailData;
 
-export async function fetchCanIEmailData(): Promise<CanIEmailData> {
+const DAY_IN_MS = 86_400;
+
+export async function fetchCanIEmailData() {
   if (cachedData) {
     return cachedData;
   }
 
-  const response = await fetch('https://www.caniemail.com/api/data.json', {
-    next: { revalidate: 86400 }, // Cache for 24 hours
-  });
+  const response = await ky<SnakeCasedPropertiesDeep<CanIEmailData>>('https://www.caniemail.com/api/data.json', {
+    next: { revalidate: DAY_IN_MS },
+  }).json();
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch caniemail data: ${response.status}`);
-  }
+  cachedData = camelcaseKeys(response, { deep: true });
 
-  cachedData = await response.json();
-
-  return cachedData!;
+  return cachedData;
 }
 
 /**
  * Get the support level for a feature in a specific client
  * Returns the most recent test result
  */
-export function getSupportLevel(
+function getSupportLevel(
   feature: CanIEmailFeature,
   family: string,
   platform: string
@@ -93,14 +94,12 @@ export function getSupportLevel(
     return null;
   }
 
-  // Get the most recent version (last key)
-  const versions = Object.keys(platformStats);
+  const latestVersion = Object.keys(platformStats).at(-1);
 
-  if (versions.length === 0) {
+  if (!latestVersion) {
     return null;
   }
 
-  const latestVersion = versions[versions.length - 1];
   const rawValue = platformStats[latestVersion];
 
   // Parse value like "a #1" into level and note reference
@@ -112,7 +111,7 @@ export function getSupportLevel(
 
   const level = match[1] as SupportLevels;
   const noteNum = match[2];
-  const note = noteNum ? feature.notes_by_num?.[noteNum] : undefined;
+  const note = noteNum ? feature.notesByNum?.[noteNum] : undefined;
 
   return { level, note, version: latestVersion };
 }
@@ -138,13 +137,20 @@ export function getFeatureSupportSummary(feature: CanIEmailFeature): {
 
     if (!support || support.level === SupportLevels.UNKNOWN) {
       result.unknown.push(client);
-    } else if (support.level === SupportLevels.YES) {
-      result.supported.push(client);
-    } else if (support.level === SupportLevels.PARTIAL) {
-      result.partial.push(client);
-    } else {
-      result.unsupported.push(client);
+      continue;
     }
+
+    if (support.level === SupportLevels.YES) {
+      result.supported.push(client);
+      continue;
+    }
+
+    if (support.level === SupportLevels.PARTIAL) {
+      result.partial.push(client);
+      continue;
+    }
+
+    result.unsupported.push(client);
   }
 
   return result;
@@ -191,32 +197,6 @@ export function buildCssPropertyMap(data: CanIEmailData): Map<string, CanIEmailF
           map.set(keyword, feature);
         }
       }
-    }
-  }
-
-  return map;
-}
-
-/**
- * Build a map of HTML elements/attributes to caniemail feature slugs
- */
-export function buildHtmlFeatureMap(data: CanIEmailData): Map<string, CanIEmailFeature> {
-  const map = new Map<string, CanIEmailFeature>();
-
-  for (const feature of data.data) {
-    if (feature.category !== 'html') {
-      continue;
-    }
-
-    // Map by slug without "html-" prefix
-    const elementName = feature.slug.replace(/^html-/, '');
-    map.set(elementName, feature);
-
-    // Map by title
-    const titleLower = feature.title.toLowerCase().replace(/[<>]/g, '');
-
-    if (titleLower !== elementName) {
-      map.set(titleLower, feature);
     }
   }
 

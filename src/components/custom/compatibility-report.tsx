@@ -1,8 +1,10 @@
 'use client';
 
-import { CircleXIcon, CircleAlertIcon, CircleCheckIcon } from 'lucide-react';
+import { CircleXIcon, CircleAlertIcon, CircleCheckIcon, ChevronDownIcon, ExternalLinkIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import {
   getEmbedUrl,
   MAJOR_CLIENTS,
@@ -78,13 +80,13 @@ function IssueCard({
     >
       <button
         onClick={onToggle}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
       >
         <SeverityIcon severity={severity} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-zinc-800 dark:text-zinc-200">{feature.title}</span>
-            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+            <span className="font-medium text-slate-800 dark:text-slate-200">{feature.title}</span>
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-400">
               {issue.property}
             </code>
           </div>
@@ -97,20 +99,13 @@ function IssueCard({
             })}
           </div>
         </div>
-        <svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          className={`h-5 w-5 text-zinc-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-        >
-          <path strokeWidth={2} d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ChevronDownIcon className={`size-5 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
 
       {isExpanded && (
-        <div className="border-t border-zinc-200 dark:border-zinc-700">
+        <div className="border-t border-slate-200 dark:border-slate-700">
           <div className="p-4">
-            <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
               {feature.description || `Support details for ${feature.title}`}
             </p>
             <a
@@ -120,14 +115,7 @@ function IssueCard({
               className="mb-4 inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
             >
               View on caniemail.com
-              <svg fill="none" className="h-3 w-3" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
+              <ExternalLinkIcon size={12} />
             </a>
           </div>
           <iframe
@@ -177,19 +165,12 @@ export function CompatibilityReport({ isLoading, issues }: CompatibilityReportPr
   if (isLoading) {
     return (
       <div className="flex h-full flex-col">
-        <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-700 dark:bg-zinc-800">
-          <h2 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Compatibility Report</h2>
+        <div className="border-b px-4 py-3">
+          <h2>Compatibility Report</h2>
         </div>
         <div className="flex flex-1 items-center justify-center">
-          <div className="flex items-center gap-2 text-zinc-500">
-            <svg fill="none" viewBox="0 0 24 24" className="h-5 w-5 animate-spin">
-              <circle r="10" cx="12" cy="12" strokeWidth="4" stroke="currentColor" className="opacity-25" />
-              <path
-                fill="currentColor"
-                className="opacity-75"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
+          <div className="flex items-center gap-2 text-slate-500">
+            <Spinner />
             <span>Analyzing compatibility...</span>
           </div>
         </div>
@@ -199,20 +180,20 @@ export function CompatibilityReport({ isLoading, issues }: CompatibilityReportPr
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 py-3.5 dark:border-zinc-700 dark:bg-zinc-800">
-        <h2 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Compatibility Report</h2>
-        <div className="flex items-center gap-3 text-xs">
+      <div className="flex items-center justify-between border-b px-4 py-3">
+        <h2>Compatibility Report</h2>
+        <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
-            <span className="text-zinc-600 dark:text-zinc-400">{errors.length} issues</span>
+            <span>{errors.length} issues</span>
           </span>
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
-            <span className="text-zinc-600 dark:text-zinc-400">{warnings.length} warnings</span>
+            <span>{warnings.length} warnings</span>
           </span>
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
-            <span className="text-zinc-600 dark:text-zinc-400">{successes.length} OK</span>
+            <span>{successes.length} OK</span>
           </span>
         </div>
       </div>
@@ -220,51 +201,40 @@ export function CompatibilityReport({ isLoading, issues }: CompatibilityReportPr
       {issues.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-8 text-center">
           <div>
-            <p className="text-zinc-500 dark:text-zinc-400">Enter email HTML to analyze compatibility</p>
-            <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
-              We&apos;ll check your CSS against {MAJOR_CLIENTS.length} major email clients
-            </p>
+            <p>Enter email HTML to analyze compatibility</p>
+            <p className="mt-1 text-sm">We&apos;ll check your CSS against {MAJOR_CLIENTS.length} major email clients</p>
           </div>
         </div>
       ) : (
         <>
-          <div className="flex gap-1 border-b border-zinc-200 px-4 py-2 dark:border-zinc-700">
-            <button
+          <div className="flex gap-1 border-b px-4 py-2">
+            <Button
+              size="sm"
+              variant={filter === 'all' ? 'secondary' : 'ghost'}
               onClick={() => {
                 return setFilter('all');
               }}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-                filter === 'all'
-                  ? 'bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
-              }`}
             >
               All ({issues.length})
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
+              variant={filter === 'errors' ? 'secondary' : 'ghost'}
               onClick={() => {
                 return setFilter('errors');
               }}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-                filter === 'errors'
-                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
-              }`}
             >
               Issues ({errors.length})
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
+              variant={filter === 'warnings' ? 'secondary' : 'ghost'}
               onClick={() => {
                 return setFilter('warnings');
               }}
-              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
-                filter === 'warnings'
-                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                  : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
-              }`}
             >
               Issues + Warnings ({errors.length + warnings.length})
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">

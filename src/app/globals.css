@@ -153,4 +153,5 @@ h4,
 h5,
 h6 {
   font-family: var(--font-serif);
+  font-weight: var(--font-weight-semibold);
 }
