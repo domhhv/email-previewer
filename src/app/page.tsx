@@ -7,6 +7,7 @@ import { EmailContentInput } from '@/components/custom/email-content-input';
 import { EmailContentPreview } from '@/components/custom/email-content-preview';
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
+import { ResizablePanel, ResizableHandle, ResizablePanelGroup } from '@/components/ui/resizable';
 import { useAsyncData } from '@/hooks/use-async-data';
 import { useDebounce } from '@/hooks/use-debounce';
 import { fetchCanIEmailData, type CanIEmailData, buildCssPropertyMap, type CanIEmailFeature } from '@/lib/caniemail';
@@ -41,19 +42,23 @@ export default function EmailContentPreviewer() {
         </div>
       )}
 
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex w-1/3 min-w-[300px] flex-col border-r">
+      <ResizablePanelGroup direction="horizontal" className="flex-1 overflow-hidden">
+        <ResizablePanel defaultSize={30}>
           <EmailContentInput value={html} onChange={setHtml} />
-        </div>
+        </ResizablePanel>
 
-        <div className="border-border flex w-1/3 min-w-[300px] flex-col border-r">
+        <ResizableHandle isWithHandle />
+
+        <ResizablePanel defaultSize={30}>
           <EmailContentPreview html={html} />
-        </div>
+        </ResizablePanel>
 
-        <div className="flex min-w-[350px] flex-1 flex-col">
+        <ResizableHandle isWithHandle />
+
+        <ResizablePanel defaultSize={40}>
           <CompatibilityReport issues={issues} isLoading={isLoading} />
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       <Footer canIEmailData={canIEmailData} />
     </div>

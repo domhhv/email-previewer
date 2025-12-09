@@ -11,9 +11,10 @@ type TooltipButtonProps = {
   tooltip: string;
   onClick: () => void;
   onMouseEnter?: () => void;
-} & Pick<ComponentProps<typeof Button>, 'variant' | 'size' | 'disabled'>;
+} & Pick<ComponentProps<typeof Button>, 'variant' | 'size' | 'disabled' | 'aria-label'>;
 
 export function TooltipButton({
+  'aria-label': ariaLabel = '',
   children,
   delayDuration = 500,
   disabled = false,
@@ -27,7 +28,7 @@ export function TooltipButton({
   return (
     <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger asChild onMouseEnter={onMouseEnter}>
-        <Button ref={ref} size={size} variant={variant} onClick={onClick} disabled={disabled}>
+        <Button ref={ref} size={size} variant={variant} onClick={onClick} disabled={disabled} aria-label={ariaLabel}>
           {children}
         </Button>
       </TooltipTrigger>

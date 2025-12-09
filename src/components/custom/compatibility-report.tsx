@@ -9,7 +9,7 @@ import {
   ExternalLinkIcon,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import * as React from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -117,23 +117,40 @@ function IssueCard({
               <ExternalLinkIcon size={12} />
             </Link>
           </div>
-          <iframe
-            loading="lazy"
-            src={getEmbedUrl(feature.slug)}
-            title={`Can I email ${feature.title}`}
-            className="h-[420px] w-full border-0 bg-white"
-          />
+          <CanIEmailEmbed featureSlug={feature.slug} />
         </div>
       )}
     </div>
   );
 }
 
-export function CompatibilityReport({ isLoading, issues }: CompatibilityReportProps) {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [filter, setFilter] = useState<'all' | 'errors' | 'warnings'>('all');
+function CanIEmailEmbed({ featureSlug }: { featureSlug: string }) {
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  const { errors, filteredIssues, successes, warnings } = useMemo(() => {
+  return (
+    <div className="relative">
+      {isLoading && <Spinner className="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2" />}
+      <iframe
+        loading="lazy"
+        src={getEmbedUrl(featureSlug)}
+        className="h-[420px] w-full border-0"
+        onLoad={() => {
+          setIsLoading(false);
+        }}
+      />
+    </div>
+  );
+}
+
+export function CompatibilityReport({ isLoading, issues }: CompatibilityReportProps) {
+  const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+  const [filter, setFilter] = React.useState<'all' | 'errors' | 'warnings'>('all');
+
+  React.useEffect(() => {
+    setExpandedIndex(null);
+  }, [issues, filter]);
+
+  const { errors, filteredIssues, successes, warnings } = React.useMemo(() => {
     const errors = issues.filter((i) => {
       return i.severity === 'error';
     });

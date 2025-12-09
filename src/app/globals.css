@@ -155,7 +155,7 @@ h6 {
   font-weight: var(--font-weight-semibold);
 }
 
-a:not([class]) {
+a:not([class^='text-']) {
   color: var(--color-sky-600);
 
   &:hover {

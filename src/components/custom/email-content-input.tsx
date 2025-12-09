@@ -8,8 +8,10 @@ import { useTheme } from 'next-themes';
 import * as React from 'react';
 
 import { TooltipButton } from '@/components/custom/tooltip-button';
-import { EnterIcon } from '@/components/icons/enter';
 import { Button } from '@/components/ui/button';
+import { Kbd, KbdGroup } from '@/components/ui/kbd';
+import { useHasKeyboard } from '@/hooks/use-has-keyboard';
+import { useModifierKeys } from '@/hooks/use-modifier-keys';
 import { sampleEmailHtml } from '@/lib/sample-email-html';
 
 type EmailInputProps = {
@@ -21,6 +23,8 @@ type EmailInputProps = {
 export function EmailContentInput({ onChange, placeholder = 'Paste your HTML email here...', value }: EmailInputProps) {
   const { resolvedTheme } = useTheme();
   const [isFocused, setIsFocused] = React.useState(false);
+  const { mod, shift } = useModifierKeys();
+  const hasKeyboard = useHasKeyboard();
 
   const extensions = React.useMemo(() => {
     return [html()];
@@ -37,10 +41,21 @@ export function EmailContentInput({ onChange, placeholder = 'Paste your HTML ema
   }, [onChange]);
 
   React.useEffect(() => {
+    if (!hasKeyboard) {
+      return;
+    }
+
     function handleKeyDown(event: KeyboardEvent) {
-      if (isFocused && !value.trim() && event.key === 'Enter') {
+      if (
+        isFocused &&
+        !value.trim() &&
+        event.key.toLowerCase() === 'e' &&
+        event.getModifierState('Shift') &&
+        event.getModifierState('Meta')
+      ) {
         event.preventDefault();
         event.stopPropagation();
+
         fillSample();
       }
     }
@@ -50,20 +65,32 @@ export function EmailContentInput({ onChange, placeholder = 'Paste your HTML ema
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isFocused, value, fillSample]);
+  }, [isFocused, value, fillSample, mod, shift, hasKeyboard]);
 
   return (
     <div className="flex h-full flex-col">
       <div className="border-border flex items-center justify-between border-b px-3 py-2">
         <h2>HTML Input</h2>
         {value.trim() ? (
-          <TooltipButton size="icon-sm" variant="ghost" onClick={clearInput} tooltip="Clear email input">
+          <TooltipButton
+            size="icon-sm"
+            variant="ghost"
+            onClick={clearInput}
+            tooltip="Clear email input"
+            aria-label="Clear email input"
+          >
             <BrushCleaningIcon className="size-4" />
           </TooltipButton>
         ) : (
           <Button size="sm" variant="secondary" onClick={fillSample}>
-            {isFocused && <EnterIcon className="fill-foreground" />}
-            Try Sample
+            {isFocused && hasKeyboard && (
+              <KbdGroup className="mr-2">
+                <Kbd className="bg-background">{mod}</Kbd>
+                <Kbd className="bg-background">{shift}</Kbd>
+                <Kbd className="bg-background">E</Kbd>
+              </KbdGroup>
+            )}
+            <span>Try Sample</span>
           </Button>
         )}
       </div>
