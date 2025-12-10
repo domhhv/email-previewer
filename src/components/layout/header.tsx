@@ -6,7 +6,7 @@ import { GithubIcon } from '@/components/icons/github';
 
 export function Header() {
   return (
-    <header className="border-border flex items-center justify-between border-b px-5 py-3">
+    <header className="border-border flex items-center justify-between gap-4 border-b px-5 py-3">
       <div>
         <h1 className="text-xl">Email Client Previewer</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">Test your email HTML against major email clients</p>
