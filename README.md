@@ -50,18 +50,18 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Project Structure
+## Project Structure (core files)
 
 ```
 ├── app/
-│   └── page.tsx              # Main page component
+│   └── page.tsx                      # Main page component
 ├── components/
 │   ├── email-content-input.tsx       # HTML textarea input
 │   ├── email-content-preview.tsx     # Sandboxed iframe preview
-│   └── compatibility-report.tsx  # Issues list with caniemail embeds
+│   └── compatibility-report.tsx      # Issues list with caniemail embeds
 ├── lib/
-│   ├── caniemail.ts          # Caniemail API types and utilities
-│   └── css-extractor.ts      # CSS property extraction from HTML
+│   ├── caniemail.ts                  # Caniemail API types and utilities
+│   └── css-extractor.ts              # CSS property extraction from HTML
 ```
 
 ## Architecture
@@ -103,7 +103,8 @@ For true cross-client preview screenshots, commercial tools like [Litmus](https:
 ## Future Improvements
 
 - [x] **CodeMirror Editor** - Syntax highlighting and better editing experience
-- [ ] **HTML Element Checking** - Currently only checks CSS; could add HTML element/attribute support
+- [x] **HTML Element Checking** - Detect unsupported HTML tags and attributes
+- [ ] **Advanced CSS Parsing** - Use PostCSS for more accurate CSS extraction
 - [ ] **Simulated Client Views** - Apply known CSS transforms per client (Gmail stripping, Outlook restrictions)
 - [ ] **React Email Support** - Compile `.tsx` files using `@react-email/render`
 - [ ] **Dark Mode Preview** - Toggle to simulate dark mode rendering
