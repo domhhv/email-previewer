@@ -23,7 +23,7 @@ import {
 } from '@/lib/caniemail';
 import { cn } from '@/lib/utils';
 
-export type FeatureType = 'css' | 'html-element' | 'html-attribute';
+export type FeatureType = 'css' | 'css-at-rule' | 'html-element' | 'html-attribute';
 
 export type CompatibilityIssue = {
   feature: CanIEmailFeature;
@@ -57,11 +57,26 @@ function SeverityIcon({ severity }: { severity: CompatibilityIssue['severity'] }
 }
 
 function FeatureTypeBadge({ featureType }: { featureType: FeatureType }) {
-  const label = featureType === 'css' ? 'CSS' : featureType === 'html-element' ? 'HTML' : 'Attr';
-  const className =
-    featureType === 'css'
-      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-      : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400';
+  const config: Record<FeatureType, { className: string; label: string }> = {
+    css: {
+      className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      label: 'CSS',
+    },
+    'css-at-rule': {
+      className: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+      label: '@rule',
+    },
+    'html-attribute': {
+      className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      label: 'Attr',
+    },
+    'html-element': {
+      className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      label: 'HTML',
+    },
+  };
+
+  const { className, label } = config[featureType];
 
   return <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium', className)}>{label}</span>;
 }
@@ -294,6 +309,7 @@ export function CompatibilityReport({ isLoading, issues }: CompatibilityReportPr
 
 export function createCompatibilityIssues(
   extractedCssProperties: Set<string>,
+  extractedCssAtRules: Set<string>,
   extractedHtmlElements: Set<string>,
   extractedHtmlAttributes: Set<string>,
   cssPropertyMap: Map<string, CanIEmailFeature>,
@@ -303,6 +319,7 @@ export function createCompatibilityIssues(
   const issues: CompatibilityIssue[] = [];
   const processedSlugs = new Set<string>();
 
+  // Process CSS properties
   for (const property of extractedCssProperties) {
     const feature = cssPropertyMap.get(property);
 
@@ -331,6 +348,36 @@ export function createCompatibilityIssues(
     });
   }
 
+  // Process CSS @-rules (media queries, keyframes, etc.)
+  for (const atRule of extractedCssAtRules) {
+    const feature = cssPropertyMap.get(atRule);
+
+    if (!feature || processedSlugs.has(feature.slug)) {
+      continue;
+    }
+
+    processedSlugs.add(feature.slug);
+
+    const summary = getFeatureSupportSummary(feature);
+
+    let severity: CompatibilityIssue['severity'] = 'success';
+
+    if (summary.unsupported.length > 0) {
+      severity = 'error';
+    } else if (summary.partial.length > 0) {
+      severity = 'warning';
+    }
+
+    issues.push({
+      feature,
+      featureType: 'css-at-rule',
+      property: atRule,
+      severity,
+      summary,
+    });
+  }
+
+  // Process HTML elements
   for (const element of extractedHtmlElements) {
     const feature = htmlElementMap.get(element);
 
@@ -359,6 +406,7 @@ export function createCompatibilityIssues(
     });
   }
 
+  // Process HTML attributes
   for (const attribute of extractedHtmlAttributes) {
     const feature = htmlAttributeMap.get(attribute);
 
