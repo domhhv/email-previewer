@@ -94,8 +94,11 @@ export default function EmailContentPreviewer() {
 
     const extracted = extractFeatures(debouncedHtml);
 
+    // Merge cssProperties and cssAtRules for the property map lookup
+    // The @-rules are also in the cssPropertyMap
     return createCompatibilityIssues(
       extracted.cssProperties,
+      extracted.cssAtRules,
       extracted.htmlElements,
       extracted.htmlAttributes,
       cssPropertyMap,
