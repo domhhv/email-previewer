@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Quicksand, Montserrat } from 'next/font/google';
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
       <body className={`${serifFont.variable} ${sansFont.variable} antialiased`}>
         <ThemeProvider enableSystem attribute="class" defaultTheme="system" disableTransitionOnChange>
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
