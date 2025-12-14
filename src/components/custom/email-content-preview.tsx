@@ -56,7 +56,7 @@ export function EmailContentPreview({ html }: EmailPreviewProps) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-2">
+      <div className="border-border flex items-center justify-between gap-2 border-b px-4 py-2.5">
         <h2 className="shrink-0">Preview</h2>
         <div className="flex items-center gap-1">
           {EMAIL_CLIENTS.map((client) => {
