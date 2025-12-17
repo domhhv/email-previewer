@@ -8,7 +8,6 @@ import { useTheme } from 'next-themes';
 import * as React from 'react';
 
 import { TooltipButton } from '@/components/custom/tooltip-button';
-import { Button } from '@/components/ui/button';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
 import { useHasKeyboard } from '@/hooks/use-has-keyboard';
 import { useModifierKeys } from '@/hooks/use-modifier-keys';
@@ -82,16 +81,22 @@ export function EmailContentInput({ onChange, placeholder = 'Paste your HTML ema
             <BrushCleaningIcon className="size-4" />
           </TooltipButton>
         ) : (
-          <Button size="sm" variant="secondary" onClick={fillSample}>
+          <TooltipButton
+            size="sm"
+            variant="default"
+            onClick={fillSample}
+            tooltip="Fill input with sample email HTML for quick compatibility preview"
+            aria-label="Fill input with sample email HTML for quick compatibility preview"
+          >
             {isFocused && hasKeyboard && (
               <KbdGroup className="mr-2">
-                <Kbd className="bg-background">{mod}</Kbd>
-                <Kbd className="bg-background">{shift}</Kbd>
-                <Kbd className="bg-background">E</Kbd>
+                <Kbd>{mod}</Kbd>
+                <Kbd>{shift}</Kbd>
+                <Kbd>E</Kbd>
               </KbdGroup>
             )}
             <span>Try Sample</span>
-          </Button>
+          </TooltipButton>
         )}
       </div>
       <div className="min-h-0 flex-1 overflow-auto">

@@ -81,7 +81,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. **Iframe-based preview** - Uses `srcdoc` with strict sandboxing for security. This shows how the email renders in a modern browser, not specific email clients.
 
-2. **Regex-based CSS extraction** - Simple and fast for the MVP. Could be upgraded to PostCSS for more robust parsing.
+2. **PostCSS-based CSS extraction** - Uses PostCSS with safe-parser for robust CSS parsing, handling nested rules, @-rules, and malformed CSS gracefully.
 
 3. **Client-side analysis** - All processing happens in the browser. The caniemail data is fetched once and cached.
 
@@ -116,7 +116,12 @@ For true cross-client preview screenshots, commercial tools like [Litmus](https:
 - [Next.js 16](https://nextjs.org) - React framework
 - [TypeScript](https://typescriptlang.org) - Type safety
 - [Tailwind CSS](https://tailwindcss.com) - Styling
+- [PostCSS](https://postcss.org) - CSS parsing
 - [caniemail.com](https://caniemail.com) - Compatibility data
+
+## Author
+
+**Dominik Hryshaiev** - [LinkedIn](https://www.linkedin.com/in/domhhv) · [GitHub](https://github.com/domhhv)
 
 ## License
 
@@ -125,5 +130,3 @@ MIT
 ## Acknowledgments
 
 - [caniemail.com](https://www.caniemail.com) for their comprehensive email client support data
-- [Resend](https://resend.com) for the interesting challenge
-- [Email favicon](https://www.flaticon.com/free-icon/email_9840614?term=mail&page=1&position=53&origin=search&related_id=9840614) is created by [lakonicon](https://www.flaticon.com/authors/lakonicon) on Flaticon
