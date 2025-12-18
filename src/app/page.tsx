@@ -4,7 +4,7 @@ import { BugIcon, FullscreenIcon, TextCursorInputIcon } from 'lucide-react';
 import * as React from 'react';
 import { useSwipeable } from 'react-swipeable';
 
-import { CompatibilityReport, createCompatibilityIssues } from '@/components/custom/compatibility-report';
+import { CompatibilityReport } from '@/components/custom/compatibility-report';
 import { EmailContentInput } from '@/components/custom/email-content-input';
 import { EmailContentPreview } from '@/components/custom/email-content-preview';
 import { MobileSwipeHint } from '@/components/custom/mobile-swipe-hint';
@@ -16,15 +16,10 @@ import { Spinner } from '@/components/ui/spinner';
 import { useAsyncData } from '@/hooks/use-async-data';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useWindowSize } from '@/hooks/use-window-size';
-import {
-  fetchCanIEmailData,
-  type CanIEmailData,
-  buildCssPropertyMap,
-  buildHtmlElementMap,
-  buildHtmlAttributeMap,
-  type CanIEmailFeature,
-} from '@/lib/caniemail';
-import { extractFeatures } from '@/lib/css-extractor';
+import { fetchCanIEmailData, createCompatibilityIssues } from '@/lib/caniemail';
+import type { CanIEmailData, CanIEmailFeature } from '@/lib/caniemail';
+import { extractFeatures } from '@/lib/feature-extractor';
+import { buildCssPropertyMap, buildHtmlElementMap, buildHtmlAttributeMap } from '@/lib/feature-map-builders';
 import { cn } from '@/lib/utils';
 
 const VIEW_MODES = ['input', 'preview', 'report'] as const;
@@ -71,20 +66,18 @@ export default function EmailContentPreviewer() {
     },
   });
 
-  const { cssPropertyMap, htmlAttributeMap, htmlElementMap } = React.useMemo(() => {
+  const [cssPropertyMap, htmlAttributeMap, htmlElementMap] = React.useMemo(() => {
     if (!canIEmailData) {
-      return {
-        cssPropertyMap: new Map<string, CanIEmailFeature>(),
-        htmlAttributeMap: new Map<string, CanIEmailFeature>(),
-        htmlElementMap: new Map<string, CanIEmailFeature>(),
-      };
+      return [
+        new Map<string, CanIEmailFeature>(),
+        new Map<string, CanIEmailFeature>(),
+        new Map<string, CanIEmailFeature>(),
+      ];
     }
 
-    return {
-      cssPropertyMap: buildCssPropertyMap(canIEmailData),
-      htmlAttributeMap: buildHtmlAttributeMap(canIEmailData),
-      htmlElementMap: buildHtmlElementMap(canIEmailData),
-    };
+    const { data: features } = canIEmailData;
+
+    return [buildCssPropertyMap(features), buildHtmlAttributeMap(features), buildHtmlElementMap(features)];
   }, [canIEmailData]);
 
   const issues = React.useMemo(() => {
@@ -94,8 +87,6 @@ export default function EmailContentPreviewer() {
 
     const extracted = extractFeatures(debouncedHtml);
 
-    // Merge cssProperties and cssAtRules for the property map lookup
-    // The @-rules are also in the cssPropertyMap
     return createCompatibilityIssues(
       extracted.cssProperties,
       extracted.cssAtRules,

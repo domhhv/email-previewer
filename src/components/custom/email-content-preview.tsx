@@ -26,7 +26,6 @@ export function EmailContentPreview({ html }: EmailPreviewProps) {
       `;
     }
 
-    // Apply client-specific transformations
     const transformed = transformForClient(html, selectedClient);
 
     const isWrappedInHtmlTag =

@@ -14,29 +14,8 @@ import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  getEmbedUrl,
-  MAJOR_CLIENTS,
-  type MajorClient,
-  type CanIEmailFeature,
-  getFeatureSupportSummary,
-} from '@/lib/caniemail';
+import { MAJOR_CLIENTS, type FeatureType, type CompatibilityIssue } from '@/lib/caniemail';
 import { cn } from '@/lib/utils';
-
-export type FeatureType = 'css' | 'css-at-rule' | 'html-element' | 'html-attribute';
-
-export type CompatibilityIssue = {
-  feature: CanIEmailFeature;
-  featureType: FeatureType;
-  property: string;
-  severity: 'error' | 'warning' | 'success';
-  summary: {
-    partial: MajorClient[];
-    supported: MajorClient[];
-    unknown: MajorClient[];
-    unsupported: MajorClient[];
-  };
-};
 
 type CompatibilityReportProps = {
   isLoading?: boolean;
@@ -161,8 +140,8 @@ function CanIEmailEmbed({ featureSlug }: { featureSlug: string }) {
       {isLoading && <Spinner className="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2" />}
       <iframe
         loading="lazy"
-        src={getEmbedUrl(featureSlug)}
         className="h-[420px] w-full border-0"
+        src={`https://embed.caniemail.com/${featureSlug}/`}
         onLoad={() => {
           setIsLoading(false);
         }}
@@ -305,135 +284,4 @@ export function CompatibilityReport({ isLoading, issues }: CompatibilityReportPr
       )}
     </div>
   );
-}
-
-export function createCompatibilityIssues(
-  extractedCssProperties: Set<string>,
-  extractedCssAtRules: Set<string>,
-  extractedHtmlElements: Set<string>,
-  extractedHtmlAttributes: Set<string>,
-  cssPropertyMap: Map<string, CanIEmailFeature>,
-  htmlElementMap: Map<string, CanIEmailFeature>,
-  htmlAttributeMap: Map<string, CanIEmailFeature>
-): CompatibilityIssue[] {
-  const issues: CompatibilityIssue[] = [];
-  const processedSlugs = new Set<string>();
-
-  // Process CSS properties
-  for (const property of extractedCssProperties) {
-    const feature = cssPropertyMap.get(property);
-
-    if (!feature || processedSlugs.has(feature.slug)) {
-      continue;
-    }
-
-    processedSlugs.add(feature.slug);
-
-    const summary = getFeatureSupportSummary(feature);
-
-    let severity: CompatibilityIssue['severity'] = 'success';
-
-    if (summary.unsupported.length > 0) {
-      severity = 'error';
-    } else if (summary.partial.length > 0) {
-      severity = 'warning';
-    }
-
-    issues.push({
-      feature,
-      featureType: 'css',
-      property,
-      severity,
-      summary,
-    });
-  }
-
-  // Process CSS @-rules (media queries, keyframes, etc.)
-  for (const atRule of extractedCssAtRules) {
-    const feature = cssPropertyMap.get(atRule);
-
-    if (!feature || processedSlugs.has(feature.slug)) {
-      continue;
-    }
-
-    processedSlugs.add(feature.slug);
-
-    const summary = getFeatureSupportSummary(feature);
-
-    let severity: CompatibilityIssue['severity'] = 'success';
-
-    if (summary.unsupported.length > 0) {
-      severity = 'error';
-    } else if (summary.partial.length > 0) {
-      severity = 'warning';
-    }
-
-    issues.push({
-      feature,
-      featureType: 'css-at-rule',
-      property: atRule,
-      severity,
-      summary,
-    });
-  }
-
-  // Process HTML elements
-  for (const element of extractedHtmlElements) {
-    const feature = htmlElementMap.get(element);
-
-    if (!feature || processedSlugs.has(feature.slug)) {
-      continue;
-    }
-
-    processedSlugs.add(feature.slug);
-
-    const summary = getFeatureSupportSummary(feature);
-
-    let severity: CompatibilityIssue['severity'] = 'success';
-
-    if (summary.unsupported.length > 0) {
-      severity = 'error';
-    } else if (summary.partial.length > 0) {
-      severity = 'warning';
-    }
-
-    issues.push({
-      feature,
-      featureType: 'html-element',
-      property: `<${element}>`,
-      severity,
-      summary,
-    });
-  }
-
-  // Process HTML attributes
-  for (const attribute of extractedHtmlAttributes) {
-    const feature = htmlAttributeMap.get(attribute);
-
-    if (!feature || processedSlugs.has(feature.slug)) {
-      continue;
-    }
-
-    processedSlugs.add(feature.slug);
-
-    const summary = getFeatureSupportSummary(feature);
-
-    let severity: CompatibilityIssue['severity'] = 'success';
-
-    if (summary.unsupported.length > 0) {
-      severity = 'error';
-    } else if (summary.partial.length > 0) {
-      severity = 'warning';
-    }
-
-    issues.push({
-      feature,
-      featureType: 'html-attribute',
-      property: attribute,
-      severity,
-      summary,
-    });
-  }
-
-  return issues;
 }
