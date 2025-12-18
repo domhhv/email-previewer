@@ -1,14 +1,11 @@
 /**
  * Email client HTML transformers
  * Simulates how different email clients process and render HTML
- *
- * IMPORTANT: These are approximations, not pixel-perfect simulations.
- * Real clients have nuances that can only be tested by actually sending emails.
  */
 
 export type EmailClient = 'browser' | 'gmail' | 'outlook' | 'yahoo';
 
-export type EmailClientInfo = {
+type EmailClientInfo = {
   description: string;
   id: EmailClient;
   label: string;
@@ -68,10 +65,8 @@ export function transformForClient(html: string, client: EmailClient): string {
 function transformForGmail(html: string): string {
   let result = html;
 
-  // Remove all <style> tags and their contents
   result = result.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
 
-  // Remove position property from inline styles (Gmail strips it)
   result = result.replace(/style\s*=\s*["']([^"']+)["']/gi, (match, styleContent) => {
     const cleaned = styleContent
       .replace(/position\s*:\s*[^;]+;?/gi, '')
@@ -95,7 +90,6 @@ function transformForGmail(html: string): string {
 function transformForOutlook(html: string): string {
   let result = html;
 
-  // Properties Outlook doesn't support well
   const unsupportedProperties = [
     /border-radius\s*:\s*[^;]+;?/gi,
     /box-shadow\s*:\s*[^;]+;?/gi,
@@ -109,7 +103,6 @@ function transformForOutlook(html: string): string {
     /align-items\s*:\s*[^;]+;?/gi,
   ];
 
-  // Clean inline styles
   result = result.replace(/style\s*=\s*["']([^"']+)["']/gi, (match, styleContent) => {
     let cleaned = styleContent;
 
@@ -122,7 +115,6 @@ function transformForOutlook(html: string): string {
     return cleaned ? `style="${cleaned}"` : '';
   });
 
-  // Clean <style> tags too
   result = result.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, (match, styleContent) => {
     let cleaned = styleContent;
 
@@ -143,6 +135,5 @@ function transformForOutlook(html: string): string {
  * - Similar restrictions to Gmail
  */
 function transformForYahoo(html: string): string {
-  // Yahoo is very similar to Gmail in terms of stripping
   return transformForGmail(html);
 }

@@ -16,18 +16,13 @@ export const sampleEmailHtml = `<!DOCTYPE html>
     </noscript>
     <![endif]-->
     <style>
-      /* ===========================================
-         CSS FEATURES THAT NEED POSTCSS TO DETECT
-         =========================================== */
-      
-      /* CSS Custom Properties (Variables) - poor email support */
       :root {
         --brand-primary: #4F46E5;
         --brand-secondary: #7C3AED;
         --spacing-md: 16px;
         --radius-lg: 12px;
       }
-      
+
       /* Reset styles */
       body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
       table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -38,7 +33,7 @@ export const sampleEmailHtml = `<!DOCTYPE html>
       .ReadMsgBody { width: 100%; }
       .ExternalClass { width: 100%; }
       .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
-      
+
       /* Modern CSS functions - calc(), clamp(), min(), max() */
       .responsive-text {
         /* calc() - limited support */
@@ -49,7 +44,7 @@ export const sampleEmailHtml = `<!DOCTYPE html>
         width: min(100%, 600px);
         padding: max(16px, 2vw);
       }
-      
+
       /* CSS Grid - not supported in most email clients */
       .feature-grid {
         display: grid;
@@ -57,7 +52,7 @@ export const sampleEmailHtml = `<!DOCTYPE html>
         gap: 16px;
         grid-auto-rows: minmax(100px, auto);
       }
-      
+
       /* Flexbox - limited support */
       .flex-container {
         display: flex;
@@ -67,26 +62,26 @@ export const sampleEmailHtml = `<!DOCTYPE html>
         flex-wrap: wrap;
         gap: 12px;
       }
-      
+
       /* Gradients - mixed support */
       .gradient-header {
         background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
         /* Fallback with radial gradient */
         background-image: radial-gradient(circle at top left, #4F46E5, #7C3AED);
       }
-      
+
       .conic-badge {
         /* Conic gradient - very poor support */
         background: conic-gradient(from 45deg, #4F46E5, #7C3AED, #4F46E5);
       }
-      
+
       /* @supports - not supported in email */
       @supports (display: grid) {
         .feature-grid {
           display: grid;
         }
       }
-      
+
       /* @keyframes animations - very limited support */
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -111,20 +106,20 @@ export const sampleEmailHtml = `<!DOCTYPE html>
         background: #4338CA !important;
         border-color: #4338CA !important;
       }
-  
+
       /* Dark mode styles with prefers-color-scheme */
       @media (prefers-color-scheme: dark) {
         .email-bg { background-color: #1a1a1a !important; }
         .body-text { color: #e5e5e5 !important; }
         .card-bg { background-color: #262626 !important; }
-        
+
         /* filter and backdrop-filter - poor support */
         .dark-overlay {
           backdrop-filter: blur(10px);
           filter: brightness(0.9);
         }
       }
-      
+
       /* prefers-reduced-motion - not widely supported */
       @media (prefers-reduced-motion: reduce) {
         .animated-element {
@@ -138,29 +133,29 @@ export const sampleEmailHtml = `<!DOCTYPE html>
         .stack-column-center { text-align: center !important; }
         .mobile-padding { padding-left: 24px !important; padding-right: 24px !important; }
         .mobile-full-width { width: 100% !important; height: auto !important; }
-        
+
         /* Nested responsive grid adjustment */
         .feature-grid {
           grid-template-columns: 1fr;
         }
-        
+
         /* aspect-ratio - limited support */
         .responsive-image {
           aspect-ratio: 16 / 9;
           object-fit: cover;
         }
       }
-      
+
       /* @font-face - limited support */
       @font-face {
         font-family: 'CustomFont';
         src: url('https://example.com/font.woff2') format('woff2');
         font-display: swap;
       }
-      
+
       /* @import - stripped by many clients */
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-      
+
       /* Modern pseudo-elements and selectors */
       .card::before {
         content: '';
@@ -168,22 +163,22 @@ export const sampleEmailHtml = `<!DOCTYPE html>
         inset: 0; /* Logical property */
         background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.1));
       }
-      
+
       /* :has() selector - cutting edge, no email support */
       .card:has(.featured-badge) {
         border: 2px solid var(--brand-primary);
       }
-      
+
       /* :is() and :where() - no email support */
       :is(h1, h2, h3) {
         font-family: 'CustomFont', system-ui, sans-serif;
       }
-      
+
       /* mix-blend-mode - poor support */
       .overlay-text {
         mix-blend-mode: multiply;
       }
-      
+
       /* scroll-behavior - irrelevant but detected */
       html {
         scroll-behavior: smooth;
@@ -197,7 +192,6 @@ export const sampleEmailHtml = `<!DOCTYPE html>
       &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
     </div>
   
-    <!-- Email wrapper table -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f5;" class="email-bg">
       <tr>
         <td align="center" style="padding: 40px 0;">
@@ -269,22 +263,19 @@ export const sampleEmailHtml = `<!DOCTYPE html>
                 </div>
               </td>
             </tr>
-  
-            <!-- Divider -->
+
             <tr>
               <td style="background-color: #ffffff; padding: 0 40px;" class="card-bg mobile-padding">
                 <hr style="margin: 0; border: none; border-top: 1px solid #e4e4e7;">
               </td>
             </tr>
   
-            <!-- Secondary content -->
             <tr>
               <td style="background-color: #ffffff; padding: 32px 40px; border-radius: 0 0 12px 12px;" class="card-bg mobile-padding">
                 <h2 style="margin: 0 0 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 600; color: #18181b;" class="body-text">
                   From the Blog
                 </h2>
-                
-                <!-- Blog post items -->
+
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                   <tr>
                     <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
@@ -310,10 +301,8 @@ export const sampleEmailHtml = `<!DOCTYPE html>
               </td>
             </tr>
   
-            <!-- Footer -->
             <tr>
               <td style="padding: 32px 24px; text-align: center;">
-                <!-- Social icons with filter effects -->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto 16px;">
                   <tr>
                     <td style="padding: 0 8px;">
@@ -333,7 +322,7 @@ export const sampleEmailHtml = `<!DOCTYPE html>
                     </td>
                   </tr>
                 </table>
-                
+
                 <p style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: #71717a;">
                   Acme Inc · 123 Main Street · San Francisco, CA 94102
                 </p>
@@ -346,8 +335,6 @@ export const sampleEmailHtml = `<!DOCTYPE html>
             </tr>
   
           </table>
-          <!-- End main container -->
-  
         </td>
       </tr>
     </table>
